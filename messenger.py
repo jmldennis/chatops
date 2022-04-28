@@ -1,28 +1,14 @@
 import json
 import requests
-import yaml
 
-
-#Get Webex API KEY from YAML File
-try:
-    with open("./config.yml", 'r') as yamlfile:
-        config = yaml.load(yamlfile, Loader=yaml.FullLoader)
-    print("Success: Loaded YAML config file")
-except Exception:
-    print("Yaml file incomplete or invalid format")
-    raise
-    
-
-
-# Webex Teams messages API endpoint
-base_url = 'https://api.ciscospark.com/v1/'
 
 class Messenger():
-    def __init__(self, base_url=base_url, api_key=config["webex_api_key"]):
-        self.base_url = base_url
-        self.api_key = config["api_key"]
+    def __init__(self, api_key):
+        self.base_url = 'https://api.ciscospark.com/v1/'
+        self.api_key = api_key
         self.headers = {
-            "Authorization": f"Bearer {api_key}",
+            "Authorization": f"Bearer {self.api_key}",
+            "Accept":"application/json",
             "Content-Type": "application/json"
         }
         self.bot_id = requests.get(f'{self.base_url}/people/me', headers=self.headers).json().get('id')
@@ -54,27 +40,19 @@ class Messenger():
         self.post_message = requests.post(post_message_url,headers=self.headers,data=json.dumps(data))
         #print(json.dumps(post_message.json(),indent=4))
 
-    def create_webhook(self, url, api_key=config["webex_api_key"]):
+    def create_webhook(self, url):
         webhooks_api = 'https://webexapis.com/v1/webhooks'
-        headers = {
-            "Content-Type":"application/json",
-            "Accept":"application/json",
-            "Authorization":f"Bearer {api_key}"
-        }
+
         data = { 
             "name": "Webhook to ChatBot",
             "resource": "all",
             "event": "all",
             "targetUrl": url
         }
-        self.create_webhook_response = requests.post(webhooks_api, headers=headers, data=json.dumps(data))
+        self.create_webhook_response = requests.post(webhooks_api, headers=self.headers, data=json.dumps(data))
 
 
-    def delete_webhook(self, webhookId, api_key=config["webex_api_key"]):
+    def delete_webhook(self, webhookId):
         webhooks_api = f'https://webexapis.com/v1/webhooks/{webhookId}'
-        headers = {
-            "Content-Type":"application/json",
-            "Accept":"application/json",
-            "Authorization":f"Bearer {api_key}"
-        }
-        self.delete_webhook_response = requests.delete(webhooks_api,headers=headers, data=json.dumps(data))
+       
+        self.delete_webhook_response = requests.delete(webhooks_api,headers=self.headers, data=json.dumps(data))
