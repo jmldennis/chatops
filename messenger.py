@@ -55,4 +55,4 @@ class Messenger():
     def delete_webhook(self, webhookId):
         webhooks_api = f'https://webexapis.com/v1/webhooks/{webhookId}'
        
-        self.delete_webhook_response = requests.delete(webhooks_api,headers=self.headers, data=json.dumps(data))
+        self.delete_webhook_response = requests.delete(webhooks_api,headers=self.headers)
