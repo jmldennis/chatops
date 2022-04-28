@@ -51,6 +51,11 @@ class Messenger():
         }
         self.create_webhook_response = requests.post(webhooks_api, headers=self.headers, data=json.dumps(data))
 
+    def get_webhook(self):
+        webhooks_api = 'https://webexapis.com/v1/webhooks'
+
+        self.get_webhook_response = requests.get(webhooks_api, headers=self.headers)
+
 
     def delete_webhook(self, webhookId):
         webhooks_api = f'https://webexapis.com/v1/webhooks/{webhookId}'
