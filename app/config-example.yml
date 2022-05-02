@@ -1,0 +1,3 @@
+#re-name file "config.yml"
+webex_api_key: <put token here>
+avwx_token : <put token here>
