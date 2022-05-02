@@ -5,6 +5,7 @@ import requests
 from flask import Flask, request, json
 import ngrok
 from time import sleep
+import avwx
 
 #Get Webex API KEY from YAML File
 try:
@@ -27,11 +28,15 @@ sleep(10)
 tunnel = ngrok.Ngrok("ngrok")
 tunnel.get_ngrok_urls()
 
+#Initialize avwx.rest API
+airport_weather = avwx.Avwx(config["avwx_token"])
+
 #Delete All Webhooks
 msg.delete_all_webhooks()
 
 #Create Webhook
 msg.create_webhook(tunnel.url["https"])
+
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -72,21 +77,26 @@ def index():
 	                # Default action is to list send the 'status' command. 
                     msg.reply = "Simply type a 4 char airport code to see the local weather info"
                     msg.post_message_room_id(msg.room_id, msg.reply)
-#                elif: 
-#	                msg.reply = 
-#	                msg.post_message(msg.room_id, msg.reply)
+                    
+                elif len(msg.message_text) == 4:
+                    airport_weather.get_weather(msg.message_text)
+                    if airport_weather.response.status_code == 200:
+                        msg.reply = airport_weather.METAR
+                        msg.post_message_room_id(msg.room_id, msg.reply)
+                    elif airport_weather.response.status_code == 204:
+                        msg.reply = "Sorry that Airport is not in the API Database"
+                        msg.post_message_room_id(msg.room_id, msg.reply)
+                    else:
+                        msg.reply = "Unknown Error..."
+                        msg.post_message_room_id(msg.room_id, msg.reply)
+                
+                else:
+                    msg.reply = "Simply type a 4 char airport code to see the local weather info"
+                    msg.post_message_room_id(msg.room_id, msg.reply)
 
                 return data
         else: 
             return ('Wrong data format', 400)
 
-
-
-
-
-
-
-
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=port)
-
