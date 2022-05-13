@@ -1,7 +1,6 @@
 import messenger
 import yaml
 import json
-import requests
 from flask import Flask, request, json
 import ngrok
 from time import sleep
@@ -36,8 +35,6 @@ msg.delete_all_webhooks()
 
 #Create Webhook
 msg.create_webhook(tunnel.url["https"])
-
-
 
 @app.route('/', methods=['GET', 'POST'])
 def index():
